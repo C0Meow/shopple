@@ -3,8 +3,42 @@ import Link from "next/link";
 
 import { CreatePost } from "~/app/_components/create-post";
 import { api } from "~/trpc/server";
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { connect } from "@planetscale/database";
+import { promises } from "dns";
 
-export default async function Home() {
+// create the connection
+const connection = connect({
+  host: process.env["DATABASE_HOST"],
+  username: process.env["DATABASE_USERNAME"],
+  password: process.env["DATABASE_PASSWORD"],
+});
+
+const db = drizzle(connection);
+
+export type CartItemType={
+  id: number;
+  category: string;
+  description: string;
+  image: string;
+  price: number;
+  title: string;
+  amount: number;
+};
+
+// const getProduct = async()=>{
+//   const query = await fetch('https://fakestoreapi.com/products');
+//   const response = query.json();
+//   return {
+//     response
+//   }
+// }
+
+if(db){
+  console.log("db ok");
+}
+
+export default async function Home({response}: CartItemType) {
   noStore();
   const hello = await api.post.hello.query({ text: "from tRPC" });
 
@@ -14,6 +48,8 @@ export default async function Home() {
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
         </h1>
+        <div>
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
           <Link
             className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
